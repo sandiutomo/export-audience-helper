@@ -9,6 +9,32 @@ const CONFIG = {
   COUNTRY_CODE: 'ID',
   LANGUAGE_CODE: 'id'
 };
+const HEADER_ALIASES = {
+  name: [
+    'name',
+    'nama',
+    'nama lengkap',
+    'full name'
+  ],
+  email: [
+    'email',
+    'alamat email',
+    'e-mail'
+  ],
+  phone: [
+    'phone',
+    'phone number',
+    'no telepon',
+    'no. telepon',
+    'nomor telepon',
+    'no tlp',
+    'no. tlp',
+    'no hp',
+    'nomor hp',
+    'handphone',
+    'hp'
+  ]
+};
 
 /******************************************************
  * MENU SYSTEM
@@ -480,7 +506,6 @@ function checkBrazeConnection() {
     ); 
   }
 }
-
 function checkMoEngageConnection() {
   console.log("Checking MoEngage Connection...");
   const p = PropertiesService.getScriptProperties();
@@ -516,7 +541,6 @@ function checkMoEngageConnection() {
     ); 
   }
 }
-
 function checkInfobipConnection() {
   console.log("Checking Infobip Connection...");
   const p = PropertiesService.getScriptProperties();
@@ -547,7 +571,6 @@ function checkInfobipConnection() {
     ); 
   }
 }
-
 function checkBitbybitConnection() {
   console.log("Checking Bitbybit Connection...");
   const p = PropertiesService.getScriptProperties();
@@ -579,7 +602,6 @@ function checkBitbybitConnection() {
     );
   }
 }
-
 function checkGupshupConnection() {
   console.log("Checking Gupshup Connection...");
   const p = PropertiesService.getScriptProperties();
@@ -610,7 +632,6 @@ function checkGupshupConnection() {
     ); 
   }
 }
-
 function checkQontakConnection() {
   console.log("Checking Mekari Qontak Connection...");
   const p = PropertiesService.getScriptProperties();
@@ -642,7 +663,6 @@ function checkQontakConnection() {
     );
   }
 }
-
 function checkMixpanelConnection() {
   console.log("Checking Mixpanel Connection...");
   try {
@@ -681,7 +701,6 @@ function sendToMixpanel(batch) {
     throw new Error("Mixpanel refused data: " + res.getContentText());
   }
 }
-
 function checkSegmentConnection() {
   console.log("Checking Segment Connection...");
   const p = PropertiesService.getScriptProperties();
@@ -716,7 +735,6 @@ function checkSegmentConnection() {
     );
   }
 }
-
 function checkConn(url, name) { 
   try { const res = UrlFetchApp.fetch(url, { muteHttpExceptions: true }); SpreadsheetApp.getUi().alert(`${name} check returned ${res.getResponseCode()}. Connection reachable.`); } 
   catch(e) { SpreadsheetApp.getUi().alert(`❌ ${name} Unreachable: ` + e.message); }
@@ -733,7 +751,6 @@ function viewGupshupStats() { viewStats('Gupshup Upload Status', 'Gupshup'); }
 function viewQontakStats() { viewStats('Qontak Upload Status', 'Mekari Qontak'); }
 function viewMixpanelStats() { viewStats('Mixpanel Upload Status', 'Mixpanel'); }
 function viewSegmentStats() { viewStats('Segment Upload Status', 'Segment'); }
-
 function viewStats(statusHeader, title) {
   const sheet = SpreadsheetApp.getActiveSheet();
   const ctx = getSheetContext(sheet, statusHeader, '');
@@ -822,7 +839,6 @@ function listRecentInfobipPeople() {
     SpreadsheetApp.getUi().alert('❌ Error: ' + e.message);
   }
 }
-
 function listRecentMixpanelUsers() {
   console.log("Fetching recent profiles from Mixpanel Engage Query API...");
   try {
@@ -899,7 +915,6 @@ function resetGupshupUploadStatus() { resetStatusColumns('Gupshup Upload Status'
 function resetQontakUploadStatus() { resetStatusColumns('Qontak Upload Status', 'Qontak Upload Date'); }
 function resetMixpanelUploadStatus() { resetStatusColumns('Mixpanel Upload Status', 'Mixpanel Upload Date'); }
 function resetSegmentUploadStatus() { resetStatusColumns('Segment Upload Status', 'Segment Upload Date'); }
-
 function resetStatusColumns(statusHeader, dateHeader) {
   const sheet = SpreadsheetApp.getActiveSheet();
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
@@ -953,10 +968,21 @@ function resetStatusColumns(statusHeader, dateHeader) {
  * SHARED HELPERS & UTILS
  ******************************************************/
 function getSheetContext(sheet, statusName, dateName) {
-  const lastRow = sheet.getLastRow(), lastCol = sheet.getLastColumn();
+  const lastRow = sheet.getLastRow();
+  const lastCol = sheet.getLastColumn();
   const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  const data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
-  return { data, statusCol: headers.indexOf(statusName), dateCol: headers.indexOf(dateName), nameCol: headers.indexOf('Name'), emailCol: headers.indexOf('Email'), phoneCol: headers.indexOf('Phone Number') };
+  const data = lastRow > 1
+    ? sheet.getRange(2, 1, lastRow - 1, lastCol).getValues()
+    : [];
+
+  return {
+    data,
+    statusCol: headers.indexOf(statusName),
+    dateCol: headers.indexOf(dateName),
+    nameCol: findHeaderIndex(headers, HEADER_ALIASES.name),
+    emailCol: findHeaderIndex(headers, HEADER_ALIASES.email),
+    phoneCol: findHeaderIndex(headers, HEADER_ALIASES.phone)
+  };
 }
 function handleEmptyOrConfirm(count, platform) {
   if (count === 0) { SpreadsheetApp.getUi().alert(`No new users for ${platform}.`); return true; }
@@ -992,6 +1018,18 @@ function setupGenericColumns(sheet, statusLabel, dateLabel) {
     sheet.getRange(1, sheet.getLastColumn() + 1).setValue(dateLabel);
   }
 }
+function findHeaderIndex(headers, aliases) {
+  const normalizedHeaders = headers.map(h =>
+    h.toString().trim().toLowerCase()
+  );
+
+  for (let i = 0; i < normalizedHeaders.length; i++) {
+    if (aliases.includes(normalizedHeaders[i])) {
+      return i;
+    }
+  }
+  return -1;
+}
 
 /******************************************************
  * DATA CLEANING
@@ -999,9 +1037,20 @@ function setupGenericColumns(sheet, statusLabel, dateLabel) {
 function normalizePhonesToE164() {
   const sheet = SpreadsheetApp.getActiveSheet();
   const data = sheet.getDataRange().getValues();
-  const idx = data[0].map(h => h.toLowerCase()).findIndex(h => h.includes('phone'));
-  if (idx === -1) return;
-  for (let i = 1; i < data.length; i++) { if (data[i][idx]) data[i][idx] = normalizeIndonesianPhone(data[i][idx]); }
+  const headers = data[0].map(h => h.toString().toLowerCase());
+
+  const phoneIdx = findHeaderIndex(headers, HEADER_ALIASES.phone);
+  if (phoneIdx === -1) {
+    SpreadsheetApp.getUi().alert('❌ Phone column not found (No Telepon / No HP / Phone).');
+    return;
+  }
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][phoneIdx]) {
+      data[i][phoneIdx] = normalizeIndonesianPhone(data[i][phoneIdx]);
+    }
+  }
+
   sheet.getDataRange().setValues(data);
   SpreadsheetApp.getUi().alert('✅ Phone formatting complete.');
 }
@@ -1016,9 +1065,6 @@ function normalizeIndonesianPhone(v) {
 function cleanEmail(v) { 
   return v ? v.toString().trim().toLowerCase() : ''; 
   }
-
-
-
 function formatName(v) { 
   return v ? v.toString().toLowerCase().split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : ''; 
   }
