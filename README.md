@@ -1,4 +1,12 @@
 [![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-4285F4?style=flat&logo=google-apps-script&logoColor=white)](https://developers.google.com/apps-script)
+[![Braze](https://img.shields.io/badge/Braze-FF5A5F?style=flat&logo=braze&logoColor=white)](https://www.braze.com/)
+[![MoEngage](https://img.shields.io/badge/MoEngage-5200FF?style=flat&logo=moengage&logoColor=white)](https://www.moengage.com/)
+[![Infobip](https://img.shields.io/badge/Infobip-1E90FF?style=flat&logo=infobip&logoColor=white)](https://www.infobip.com/)
+[![Gupshup](https://img.shields.io/badge/Gupshup-00A4E4?style=flat&logo=whatsapp&logoColor=white)](https://www.gupshup.io/)
+[![Mixpanel](https://img.shields.io/badge/Mixpanel-7856FF?style=flat&logo=mixpanel&logoColor=white)](https://mixpanel.com/)
+[![Segment](https://img.shields.io/badge/Segment-52BD95?style=flat&logo=segment&logoColor=white)](https://segment.com/)
+
+
 
 # 📊 Google Sheets → Multi-Platform Sync Tool
 
