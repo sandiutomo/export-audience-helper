@@ -1,3 +1,5 @@
 .clasp.json
 .DS_Store
 node_modules/
+assets for readme/
+*.gif
