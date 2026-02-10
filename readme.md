@@ -1,4 +1,4 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-4285F4?style=flat&logo=google-apps-script&logoColor=white)](https://developers.google.com/apps-script)
 
 # 📊 Google Sheets → Multi-Platform Sync Tool
 
@@ -19,6 +19,8 @@ A powerful Google Apps Script that transforms your Google Sheets into a contact 
 ---
 
 ## ✨ Features
+
+![hippo](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDIxMms2d2d1cXVjcG0ycmM2NmtqNWliYXBocWtzbXB5bWRlaXU2bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/rDq5czmtfL35tFADts/giphy.gif)
 
 - **One-Click Uploads** - Sync contacts directly from Google Sheets custom menu
 - **Phone Normalization** - Automatic Indonesia phone number formatting (+62 E.164 format)
